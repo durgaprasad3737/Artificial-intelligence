@@ -1,0 +1,54 @@
+Logic
+1.	We're going to play with prolog today.
+2.	There is an online prolog interpreter here .
+3.	I also used the syntax from a prolog wiki .
+4.	Type in queries in the bottom right window (e.g. writeln(hello).)
+5.	Write code in the left window (after create a new program).
+6.	Try canary(tweety).
+7.	You can look at examples too.
+8.	Let's do an animal ontology.
+9.	Make some animals, and make a sub-categorisation hierarchy (e.g. dogs are canines and canines mammals).
+10.	Make some queries.
+11.	Use and (the operator). (I did it using things like adult and puppy).
+12.	Try to add features like feathers and fur.
+13.	Can you use not?
+14.	Can you override inheritance (birds fly, but ostriches don't)?
+
+
+sol: 
+livingthing(animal).
+
+class(dog, mammal).
+class(cat, mammal).
+class(whale, mammal).
+class(fish, vertebrate).
+class(bird, vertebrate).
+
+bird(
+lives_in(dog, land).
+lives_in(cat, land).
+lives_in(whale, water).
+lives_in(eagle, air).
+lives_in(salmon, water).
+
+instance(eagle, bird).
+instance(salmon, fish).
+instance(parrot, bird).
+instance(crow, bird).
+instance(ostrich, bird).
+
+features(dog, fur).
+features(cat, fur).
+
+size(osrtrich,big).
+
+movement(ostrich, walk).
+movement(parrot, fly).
+movement(eagle, fly).
+movement(crow, fly).
+
+water_mammal(X) :- class(X, mammal), lives_in(X, water).
+
+flying(X) :- instance(X, bird), movement(X, fly).
+flying(X):- instance(X,Y),class(Y,mammal),X\=Y.
+walk(X):- instance(X,Y),class(Y,vertebrate),movement(X,walk).
