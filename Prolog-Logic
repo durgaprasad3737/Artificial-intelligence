@@ -24,7 +24,7 @@ class(whale, mammal).
 class(fish, vertebrate).
 class(bird, vertebrate).
 
-bird(
+
 lives_in(dog, land).
 lives_in(cat, land).
 lives_in(whale, water).
