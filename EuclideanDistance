@@ -1,0 +1,124 @@
+Vision, Print a Picture
+1.	Write a java program that...
+2.	Read in the first line of the digits.csv file. This is the first 20 lines of the digits task from course work 2. I've saved it from xl in comma separated values. (It's just text with commas.)
+3.	There are 65 elements. The last is the category. Print out the integer value of each.
+4.	Now store those in a 20x64 (or 20x65, or a 20x64 and a 20) integer array.
+5.	Print the letter out in 8 rows of 8 columns. The higher the value, the bigger the character. (I used space . x X). This should look something like a 0.  This is not part of the course work.
+6.	Read in and print out all 20.
+7.	Using euclidean distance, compare each of the second 10 to the first 10, and see which is nearest. (loop for 11 to 20 and print out which of the first 10 is closest to 11 etc.)
+8.	Expand to the full course work data. This should be enough to pass the course work.
+
+
+sol:
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+
+public class ReadDigits {
+
+    // reads a csv file into an array: each row = 64 pixels + category (65 values)
+    public static int[][] load(String filename) {
+        ArrayList<int[]> rows = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty()) continue;          
+
+                String[] parts = line.split(",");
+                int[] row = new int[parts.length];
+                for (int i = 0; i < parts.length; i++) {
+                    row[i] = Integer.parseInt(parts[i].trim());
+                }
+                rows.add(row);
+            }
+        } catch (IOException e) {
+            System.out.println("Couldn't read " + filename + ": " + e.getMessage());
+        }
+
+        return rows.toArray(new int[0][]);
+    }
+
+   
+    public static double distance(int[] a, int[] b) {
+        double sum = 0;
+        for (int i = 0; i < 64; i++) {
+            double d = a[i] - b[i];
+            sum += d * d;
+        }
+        return Math.sqrt(sum);
+    }
+
+    
+    public static void printDigit(int[] pixels) {
+        char[] shades = {' ', '.', 'x', 'X'};
+
+        for (int r = 0; r < 8; r++) {
+            for (int c = 0; c < 8; c++) {
+                int level = Math.min(pixels[r * 8 + c] / 4, 3);
+                System.out.print(shades[level]);
+                System.out.print(' ');
+            }
+            System.out.println();
+        }
+    }
+
+   
+    public static int classify(int[][] train, int[][] test, boolean verbose) {
+        int correct = 0;
+
+        for (int t = 0; t < test.length; t++) {
+            int best = -1;
+            double bestDist = Double.MAX_VALUE;
+
+            for (int j = 0; j < train.length; j++) {
+                double d = distance(test[t], train[j]);
+                if (d < bestDist) {
+                    bestDist = d;
+                    best = j;
+                }
+            }
+
+            boolean right = train[best][64] == test[t][64];
+            if (right) correct++;
+
+            if (verbose) {
+                System.out.println("Row " + (t + 1) + " (category " + test[t][64]
+                        + ") is closest to train row " + (best + 1)
+                        + " (category " + train[best][64] + "), distance "
+                        + String.format("%.2f", bestDist)
+                        + (right ? "  correct" : "  WRONG"));
+            }
+        }
+        return correct;
+    }
+
+    public static void main(String[] args) {
+
+        
+        int[][] all = load("digits.csv");
+
+        for (int r = 0; r < all.length; r++) {
+            System.out.println("Row " + (r + 1) + ", category " + all[r][64]);
+            printDigit(all[r]);
+            System.out.println();
+        }
+
+        
+        int[][] first10 = new int[10][];
+        int[][] second10 = new int[10][];
+        for (int i = 0; i < 10; i++) {
+            first10[i] = all[i];
+            second10[i] = all[i + 10];
+        }
+
+        System.out.println("=== Rows 11-20 compared to rows 1-10 ===");
+        int correct = classify(first10, second10, true);
+        System.out.println(correct + " / 10 correct");
+
+       
+    }
+}
